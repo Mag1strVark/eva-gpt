@@ -7,6 +7,7 @@ import fs from 'fs'
 import pino from 'pino'
 import player from 'play-sound'
 import { Readable } from 'node:stream'
+import ElevenLabs from 'elevenlabs-node'
 import { iamRepository } from './utils/Iam/index.js'
 import { getTextCompletion, recognizeVoice, vocalizeText } from './utils/yandex/index.js'
 
@@ -28,6 +29,16 @@ const folder_id = process.env.FOLDER_ID
 const system_role_text = process.env.SYSTEM_ROLE_TEXT
 const voice = process.env.SYSTEM_VOICE
 const emotion = process.env.SYSTEM_EMOTION
+
+const elven_labs_api_key = process.env.ELEVEN_LABS_API_KEY
+const voice_id = process.env.VOICE_ID
+
+const typeVoiceService = process.env.VOICE_SERVICE ?? 'yandex'
+
+const voiceElevenLabs = new ElevenLabs({
+  apiKey: elven_labs_api_key,
+  voiceId: voice_id,
+})
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
@@ -58,7 +69,7 @@ const handleSilence = async () => {
   const message = await transcribeAudio(oggBuffer)
   if (message) {
     const responseText = await getYandexGptResponse(message)
-    const saveAudio = await convertResponseToAudio(responseText)
+    const saveAudio = await convertResponseToAudio(responseText, typeVoiceService)
     await playMp3(saveAudio)
   }
 }
@@ -118,28 +129,52 @@ const getYandexGptResponse = async (message: string) => {
   return response.result.alternatives[0].message.text
 }
 
-const convertResponseToAudio = async (text: string) => {
+const convertResponseToAudio = async (text: string, type: string) => {
   const fileName = `${Date.now()}.mp3`
   logger.info('Преобразование ответа в звук...')
-  const audioStream = await vocalizeText({
-    text: text,
-    folder_id: folder_id ?? '',
-    lang: 'ru-RU',
-    token: iamRepository.value ?? '',
-    voice: voice ?? '',
-    emotion: emotion ?? '',
-  })
-  fs.writeFileSync(`./audio/${fileName}`, Buffer.from(audioStream))
-  logger.info(
-    {
-      path: `./audio/${fileName}`,
-    },
-    'Преобразование звука завершено...'
-  )
-  return `./audio/${fileName}`
+  if (type === 'yandex') {
+    logger.info('Выбран Yandex...')
+    const audioStream = await vocalizeText({
+      text: text,
+      folder_id: folder_id ?? '',
+      lang: 'ru-RU',
+      token: iamRepository.value ?? '',
+      voice: voice ?? '',
+      emotion: emotion ?? '',
+    })
+    fs.writeFileSync(`./audio/${fileName}`, Buffer.from(audioStream))
+    logger.info(
+      {
+        path: `./audio/${fileName}`,
+      },
+      'Преобразование звука завершено...'
+    )
+    return `./audio/${fileName}`
+  } else if (type === 'elevenlabs') {
+    logger.info('Выбран ElevenLabs...')
+    const audioStream = await voiceElevenLabs.textToSpeechStream({
+      textInput: text,
+      voiceId: voice_id,
+      modelId: 'eleven_multilingual_v2',
+    })
+    const fileWriteStream = fs.createWriteStream('./audio/' + fileName)
+    audioStream.pipe(fileWriteStream)
+    return new Promise((resolve, reject) => {
+      fileWriteStream.on('finish', () => {
+        logger.info(
+          {
+            path: `./audio/${fileName}`,
+          },
+          'Преобразование звука завершено...'
+        )
+        resolve(`./audio/${fileName}`)
+      })
+      audioStream.on('error', reject)
+    })
+  }
 }
 
-const playMp3 = async (filePath: string) => {
+const playMp3 = async (filePath: any) => {
   logger.info('Воспроизведение аудиозаписи...')
   await audioPlayer.play(filePath, function (err: any) {
     if (err) {
