@@ -1,14 +1,30 @@
 {
   "name": "eva-voice-assistant",
   "version": "1.0.0",
-  "description": "",
+  "description": "Eva voice assistant on node js using YandexGpt API",
+  "homepage": "https://github.com/Mag1strVark/eva-yandex-gpt/blob/main/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mag1strVark/eva-yandex-gpt"
+  },
   "main": "index.ts",
   "type": "module",
   "scripts": {
     "start": "chcp 65001 && npx tsc && node dist/index.js | pino-pretty"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "yandexGPT",
+    "yandexGptAPI",
+    "node",
+    "nodejs",
+    "voiceGPTAssistant",
+    "voiceAssistantEva",
+    "Eva"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "author": "Mag1strVark",
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
