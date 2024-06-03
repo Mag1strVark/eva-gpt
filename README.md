@@ -20,7 +20,7 @@ SYSTEM_ROLE_TEXT=<Промт для YandexGPT> # https://yandex.cloud/ru/docs/fo
 SYSTEM_VOICE=<Голос> # https://yandex.cloud/en/docs/speechkit/tts/voices
 SYSTEM_EMOTION=<Эмоция голоса> # https://yandex.cloud/en/docs/speechkit/tts/voices
 
-ELEVEN_LABS_API_KEY=<API ключ elevenlabs> # https://elevenlabs.io/app/speech-synthesis
+ELEVENLABS_API_KEY=<API ключ elevenlabs> # https://elevenlabs.io/app/speech-synthesis
 VOICE_ID=<ID голоса elevenlabs> # https://elevenlabs.io/docs/voices/premade-voices
 
 # 'yandex' | 'elevenlabs'

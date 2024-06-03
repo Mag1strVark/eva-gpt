@@ -6,7 +6,9 @@ import {
   ITextCompletionResponse,
   IVocalizeText,
 } from './yandex.types'
-import { logger } from '../../index.js'
+import { logger } from '../../logger/index.js'
+import { iamRepository } from '../../repository/index.js'
+import { folder_id, system_role_text } from '../../index.js'
 
 export const getTextCompletion = async (
   props: IPropsTextCompletion
@@ -117,4 +119,21 @@ export const vocalizeText = async (props: IVocalizeText) => {
       logger.error(error, 'Неизвестная ошибка:')
     }
   }
+}
+
+export const getYandexGptResponse = async (message: string) => {
+  logger.info('Связь с YandexGpt...')
+  const response = await getTextCompletion({
+    model: 'yandexgpt/latest',
+    system_text: system_role_text,
+    folder_id: folder_id,
+    iam_token: iamRepository.value,
+    messages: [
+      {
+        role: 'user',
+        text: message,
+      },
+    ],
+  })
+  return response.result.alternatives[0].message.text
 }

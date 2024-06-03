@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { IamRepository, IamToken } from './Iam.types'
+import { IamRepository, IamToken } from './repository.types'
 
 const getIamToken = async (token: string | undefined): Promise<IamToken> => {
   try {
