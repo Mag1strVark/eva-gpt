@@ -2,10 +2,10 @@
   "name": "eva-voice-assistant",
   "version": "1.0.0",
   "description": "Eva voice assistant on node js using YandexGpt API",
-  "homepage": "https://github.com/Mag1strVark/eva-yandex-gpt/blob/main/README.md",
+  "homepage": "https://github.com/Mag1strVark/eva-gpt/blob/main/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Mag1strVark/eva-yandex-gpt"
+    "url": "https://github.com/Mag1strVark/eva-gpt"
   },
   "main": "index.ts",
   "type": "module",
